@@ -18,12 +18,12 @@ Config = {
 }
 
 Translation = {
-    ['no_perms'] = '~r~Dieser Befehl ist nur für Admins',
-    ['ticket_created'] = 'Dein Ticket wurde ~g~erfolgreich ~s~erstellt!',
-    ['requires_reason'] = 'Du ~r~musst~s~ einen ~b~Grund~s~ angeben um dein Ticket abzuschicken!',
-    ['no_message_provided'] = 'Keine Nachricht',
-    ['set_waypoint'] = 'Der Wegpunkt zum Spieler wurde ~g~erfolgreich~s~ gesetzt!',
-    ['teleported'] = 'Du hast dich ~g~erfolgreich~s~ zum Spieler teleportiert',
+    ['no_perms'] = '~r~You do not have permissions',
+    ['ticket_created'] = 'You ~g~succesfully~s~ created a support ticket!',
+    ['requires_reason'] = 'You ~r~need~s~ to provide a ~b~reason~s~ to open a ticket!',
+    ['no_message_provided'] = 'No message',
+    ['set_waypoint'] = 'Set waypoint to player succesfully.',
+    ['teleported'] = 'Teleported to player successfully.',
     ['ticket_open'] = 'Open',
     ['nonotify_enable'] = 'You will not recieve a notification for tickets anymore!',
     ['nonotify_disable'] = 'You will recieve a notification for tickets again!',
