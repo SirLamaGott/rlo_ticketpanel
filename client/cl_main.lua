@@ -68,11 +68,11 @@ RegisterNetEvent('rlo_ticketpanel:client:syncRequest', function(activeTickets, n
         })
 
         if Config.Sound.Enabled then 
-            if GetResourceState('rlo_sound') == 'missing' then 
+            if GetResourceState('xsound') == 'missing' then 
                 print('We ran into a issue: xSound is missing!')
                 return
             else 
-                exports['rlo_sound']:PlayUrl('ticket_notify_idfy', Config.Sound.URL, Config.Sound.Volume, false)
+                exports['xsound']:PlayUrl('ticket_notify_idfy', Config.Sound.URL, Config.Sound.Volume, false)
             end
         end
     end
