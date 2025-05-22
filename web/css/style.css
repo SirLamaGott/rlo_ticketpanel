@@ -1,0 +1,144 @@
+body {
+  background: none;
+  color: white;
+}
+
+.header, .content-header {
+  background-color: #2c2c2c;
+  padding: 15px 20px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.header h2 {
+  color: #e0e0e0;
+}
+
+.header .btn, .content-header .btn {
+  margin: 5px;
+  padding: 8px 12px;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.header .btn:hover, .content-header .btn:hover {
+  background-color: #414141;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.content-header .column {
+  display: flex;
+  align-items: center;
+}
+
+.content-header .column img {
+  width: 27px;
+  height: 27px;
+  margin-right: 10px;
+  border-radius: 50%;
+}
+
+.price-up {
+  color: #4caf50; /* Modernes Grün */
+}
+
+.price-equal {
+  color: #d3d3d3;
+}
+
+.price-down {
+  color: #ff5252; /* Lebendigeres Rot */
+}
+
+.bor {
+  border-bottom: 2px solid #555555;
+}
+
+.up, .down {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.up:hover, .down:hover {
+  transform: scale(1.1);
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+  filter: invert(1) brightness(2);
+  transition: transform 0.2s ease;
+}
+
+.icon:hover {
+  transform: rotate(20deg);
+}
+
+.input-shorter {
+  width: 200px;
+  margin: 6px;
+  padding: 8px;
+  border: 1px solid #444;
+  background-color: #3a3a3a;
+  color: #e0e0e0;
+  border-radius: 5px;
+}
+
+.input-shorter:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.background-container {
+  background-color: #2e2e2e;
+  padding: 20px;
+  margin: 50px auto;
+  border-radius: 10px;
+  max-width: 1200px;
+}
+
+.max-bounds {
+  max-width: 1400px; /* 1200px */
+  max-height: 768px;
+  padding: 27.5px;
+  overflow-y: auto;
+  background: #1e1e1e;
+  border-radius: 10px;
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.55);
+}
+
+/* Modern Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #2c2c2c;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(180, 180, 180, 0.4);
+  border-radius: 10px;
+  transition: background-color 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(180, 180, 180, 0.7);
+}
+
+.header .btn, .content-header .btn {
+  margin: 8px;
+  color: white;
+  border: none;
+  border-radius: 8px;
+}
+
