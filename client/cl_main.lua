@@ -1,6 +1,28 @@
 local isInPanel, noNotify = false, false
+local activeTicketMarkers = {}
+
+CreateThread(function()
+    while true do
+        local hasMarkers = false
+        for uniqueId, markerData in pairs(activeTicketMarkers) do
+            local player = GetPlayerFromServerId(markerData.playerId)
+            if player == -1 then
+                activeTicketMarkers[uniqueId] = nil
+            else
+                local ped = GetPlayerPed(player)
+                if ped and ped ~= 0 and DoesEntityExist(ped) then
+                    hasMarkers = true
+                    local coords = GetEntityCoords(ped)
+                    DrawText3D(coords.x, coords.y, coords.z + 1.2)
+                end
+            end
+        end
+        Wait(hasMarkers and 0 or 500)
+    end
+end)
 
 RegisterNUICallback('close', function(data, cb) closeUi() end)
+
 function closeUi()
     isInPanel = false
     SetNuiFocus(false, false)
@@ -15,16 +37,17 @@ RegisterCommand(Config.PanelCommand or 'adminPanel', function(source, args, rawC
                 isInPanel = true
                 SendNUIMessage({type = 'open'})
                 SetNuiFocus(true, true)
+
                 if Config.KeepInput then 
                     SetNuiFocusKeepInput(true)
                     CreateThread(function()
                         while isInPanel do
                             Wait(0)
-                            DisableControlAction(0, 24, true)  --INPUT_ATTACK
-                            DisableControlAction(0, 45, true)  --INPUT_RELOAD
-                            DisableControlAction(0, 1, true)   --LookLeftRight
-                            DisableControlAction(0, 2, true)   --LookUpDown
-                            DisableControlAction(2, 200, true) --ESC
+                            DisableControlAction(0, 24, true)
+                            DisableControlAction(0, 45, true)
+                            DisableControlAction(0, 1, true)
+                            DisableControlAction(0, 2, true)
+                            DisableControlAction(2, 200, true)
 
                             if IsDisabledControlJustReleased(2, 200) then 
                                 closeUi()
@@ -57,6 +80,11 @@ RegisterNetEvent('rlo_ticketpanel:client:syncRequest', function(activeTickets, n
     if not ticketContent then return end
 
     print('Trying to sync, TicketContent', ESX.DumpTable(ticketContent))
+
+    activeTicketMarkers[newUniqueId] = {
+        playerId = ticketContent.playerId,
+        playerName = ticketContent.playerName
+    }
 
     SendNUIMessage({type = 'createTicket', ticketContent = ticketContent})
 
@@ -91,20 +119,50 @@ RegisterNUICallback('teleport', function(targetId)
     end, targetId)
 end)
 
-RegisterNUICallback('syncDelete', function(uniqueId)  TriggerServerEvent('rlo_ticketpanel:server:syncDelete', uniqueId) end)
-RegisterNetEvent('rlo_ticketpanel:client:syncDelete', function(uniqueId) SendNUIMessage({type = 'removeTicket', uniqueId = uniqueId}) end)
+RegisterNUICallback('syncDelete', function(uniqueId)  
+    TriggerServerEvent('rlo_ticketpanel:server:syncDelete', uniqueId) 
+end)
+
+RegisterNetEvent('rlo_ticketpanel:client:syncDelete', function(uniqueId)
+    activeTicketMarkers[uniqueId] = nil
+    SendNUIMessage({type = 'removeTicket', uniqueId = uniqueId})
+end)
 
 RegisterNUICallback('syncState', function(ticketContent)  
     print('(Client) syncing this is the ticket content:', ESX.DumpTable(ticketContent))
     TriggerServerEvent('rlo_ticketpanel:server:syncState', ticketContent) 
 end)
-RegisterNetEvent('rlo_ticketpanel:client:syncState', function(ticketContent) SendNUIMessage({type = 'syncState', ticketContent = ticketContent}) end)
 
+RegisterNetEvent('rlo_ticketpanel:client:syncState', function(ticketContent)
+    if ticketContent and ticketContent.uniqueId ~= nil then
+        activeTicketMarkers[ticketContent.uniqueId] = {
+            playerId = ticketContent.playerId,
+            playerName = ticketContent.playerName
+        }
+
+        SendNUIMessage({type = 'createRequest', ticketContent = ticketContent})
+        return
+    end
+
+    for uniqueId, activeTicketContent in pairs(ticketContent or {}) do
+        activeTicketMarkers[uniqueId] = {
+            playerId = activeTicketContent.playerId,
+            playerName = activeTicketContent.playerName
+        }
+
+        SendNUIMessage({type = 'createRequest', ticketContent = activeTicketContent})
+    end
+end)
 
 RegisterNetEvent('rlo_ticketpanel:client:syncOnJoin', function(activeTickets)
     print('Active Tickets: '..ESX.DumpTable(activeTickets))
+
     for uniqueId, ticketContent in pairs(activeTickets) do
-        print('uniqueId: '..uniqueId.. ' | ticketContent: '..ESX.DumpTable(ticketContent))
+        activeTicketMarkers[uniqueId] = {
+            playerId = ticketContent.playerId,
+            playerName = ticketContent.playerName
+        }
+
         SendNUIMessage({type = 'createRequest', ticketContent = ticketContent})
     end
 end)
