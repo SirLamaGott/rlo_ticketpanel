@@ -23,13 +23,12 @@ function generateRandomNumber(length)
 end
 
 function SendWebhook(source, msg)
-    local xPlayer = ESX.GetPlayerFromId(source)
-    local playerCoords = xPlayer.getCoords(true)
-    local playerId = xPlayer.identifier
-    local playerName = xPlayer.getName()
+    local playerCoords = Bridge.GetCoords(source)
+    local playerId = Bridge.GetIdentifier(source)
+    local playerName = GetPlayerName(source)
 
     local timestamp = os.time()
-    local color = (#ESX.GetExtendedPlayers('group', 'admin') <= 0) and 15548997 or 5763719
+    local color = (Bridge.CountOnlineAdmins() <= 0) and 15548997 or 5763719
 
     local embed = {
         {
