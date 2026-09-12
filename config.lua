@@ -1,5 +1,7 @@
 Config = {
-    Debug = false, 
+    Framework = 'esx', -- 'esx' or 'qb'
+
+    Debug = false,
     Groups = {'admin'},
 
     TicketCommand = 'support',
