@@ -36,6 +36,8 @@ Bridge.RegisterServerCallback('rlo_ticketpanel:callback:isAdmin', function(sourc
 end)
 
 RegisterCommand(Config.TicketCommand or 'support', function(source, args)
+    if source == 0 then return end
+
     local message = table.concat(args, ' '):match("^%s*(.-)%s*$") or ""
 
     if Config.RequiresReason and message == "" then
@@ -72,7 +74,7 @@ RegisterNetEvent('rlo_ticketpanel:server:syncState', function(ticketContent)
     local packedTicket
     for id, requestContent in pairs(activeTickets) do
         if requestContent.uniqueId == ticketContent.uniqueId then
-            activeTickets[id].claimedBy = GetPlayerName(source)
+            activeTickets[id].claimedBy = Bridge.GetName(source)
             packedTicket = activeTickets[id]
         end
     end

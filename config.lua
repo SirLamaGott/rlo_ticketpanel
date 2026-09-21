@@ -1,5 +1,5 @@
 Config = {
-    Framework = 'esx', -- 'esx' or 'qb'
+    Framework = 'qb', -- 'esx' or 'qb'
 
     Debug = false,
     Groups = {'admin'},

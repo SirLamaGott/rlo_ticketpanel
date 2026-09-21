@@ -25,7 +25,7 @@ end
 function SendWebhook(source, msg)
     local playerCoords = Bridge.GetCoords(source)
     local playerId = Bridge.GetIdentifier(source)
-    local playerName = GetPlayerName(source)
+    local playerName = Bridge.GetName(source)
 
     local timestamp = os.time()
     local color = (Bridge.CountOnlineAdmins() <= 0) and 15548997 or 5763719

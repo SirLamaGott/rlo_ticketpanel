@@ -18,6 +18,16 @@ function Bridge.GetCoords(source)
     end
 end
 
+function Bridge.GetName(source)
+    if Config.Framework == 'qb' then
+        local Player = Core.Object.Functions.GetPlayer(source)
+        return Player and (Player.PlayerData.charinfo.firstname .. ' ' .. Player.PlayerData.charinfo.lastname) or GetPlayerName(source)
+    else
+        local xPlayer = Core.Object.GetPlayerFromId(source)
+        return xPlayer and xPlayer.getName() or GetPlayerName(source)
+    end
+end
+
 function Bridge.GetIdentifier(source)
     if Config.Framework == 'qb' then
         local Player = Core.Object.Functions.GetPlayer(source)
