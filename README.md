@@ -1,5 +1,5 @@
 # rlo_ticketpanel
-This FiveM script for ESX provides an intuitive in-game UI where players can create support tickets. Moderators can then access these tickets, claim them, teleport directly to the player, and manage the entire support process efficiently within the game. It streamlines support, making it easier for both players to get help and staff to provide it.
+This FiveM script for ESX and QBCore provides an intuitive in-game UI where players can create support tickets. Moderators can then access these tickets, claim them, teleport directly to the player, and manage the entire support process efficiently within the game. It streamlines support, making it easier for both players to get help and staff to provide it.
 
 ## Features
 
@@ -11,7 +11,7 @@ This FiveM script for ESX provides an intuitive in-game UI where players can cre
 ## Installation
 
 1. Download this repository and place it in your FiveM server's resources folder.
-2. Ensure that ESX is installed on your server.
+2. Ensure that ESX or QBCore is installed on your server.
 3. Add the script to your `server.cfg` file:
 
    ```plaintext
@@ -27,6 +27,8 @@ The configuration is handled via the `config.lua` file. Here are some of the key
 
 ```lua
 Config = {
+    Framework = 'esx', -- 'esx' or 'qb'
+
     Debug = false, 
     Groups = {'admin'},
 
@@ -66,5 +68,5 @@ Translation = {
 
 ## Dependencies
 
-- **[ESX](https://github.com/esx-framework/esx_core):** ESX framework for FiveM.
+- **[ESX](https://github.com/esx-framework/esx_core)** or **[QBCore](https://github.com/qbcore-framework/qb-core)**: set `Config.Framework` to `'esx'` or `'qb'` accordingly.
 - **[xsound (optional)]([https://github.com/overextended/ox_lib](https://github.com/Xogy/xsound)):** Improved audio library for FiveM.

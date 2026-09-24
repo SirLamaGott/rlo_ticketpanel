@@ -16,93 +16,79 @@ function CreateTicket(playerId, reason)
         playerName = playerName,
         playerCoords = playerCoords,
     }
-    
+
     activeTickets[uniqueId] = ticketContent
 
     for _, id in ipairs(GetPlayers()) do
-        local xPlayer = ESX.GetPlayerFromId(id)
-        if xPlayer and tableHasValue(Config.Groups, xPlayer.getGroup()) then 
-            xPlayer.triggerEvent('rlo_ticketpanel:client:syncRequest', activeTickets, uniqueId)
+        if Bridge.IsAdmin(id) then
+            TriggerClientEvent('rlo_ticketpanel:client:syncRequest', id, ticketContent)
         end
     end
 end
 
-ESX.RegisterServerCallback('rlo_ticketpanel:callback:getTargetCoords', function(src, cb, playerId)
-    local xPlayer = ESX.GetPlayerFromId(playerId)
-    local playerCoords = xPlayer.getCoords(true)
-   cb(playerCoords)
+Bridge.RegisterServerCallback('rlo_ticketpanel:callback:getTargetCoords', function(source, cb, playerId)
+    if not Bridge.IsAdmin(source) then return cb(nil) end
+    cb(Bridge.GetCoords(playerId))
 end)
 
-ESX.RegisterServerCallback('rlo_ticketpanel:callback:isAdmin', function(source, cb)
-	local xPlayer = ESX.GetPlayerFromId(source)
-	if xPlayer ~= nil then
-        if tableHasValue(Config.Groups, xPlayer.getGroup()) then 
-            cb(true)
-		else
-			cb(false)
-        end
-	else
-		cb(false)
-	end
+Bridge.RegisterServerCallback('rlo_ticketpanel:callback:isAdmin', function(source, cb)
+    cb(Bridge.IsAdmin(source))
 end)
 
 RegisterCommand(Config.TicketCommand or 'support', function(source, args)
-    local xPlayer = ESX.GetPlayerFromId(source)
-    if not xPlayer then return end
+    if source == 0 then return end
 
     local message = table.concat(args, ' '):match("^%s*(.-)%s*$") or ""
-    
+
     if Config.RequiresReason and message == "" then
-        xPlayer.triggerEvent('rlo_ticketpanel:client:showNotification', Translation['requires_reason'])
+        TriggerClientEvent('rlo_ticketpanel:client:showNotification', source, Translation['requires_reason'])
         return
     end
-    
-    xPlayer.triggerEvent('rlo_ticketpanel:client:showNotification', Translation['ticket_created'])
+
+    TriggerClientEvent('rlo_ticketpanel:client:showNotification', source, Translation['ticket_created'])
     CreateTicket(source, message ~= '' and message or Translation['no_message_provided'])
     SendWebhook(source, message)
 end, false)
 
 RegisterNetEvent('rlo_ticketpanel:server:syncDelete', function(uniqueId)
+    local source = source
+    if not Bridge.IsAdmin(source) then return end
+
     for id, ticketContent in pairs(activeTickets) do
-        if ticketContent.uniqueId == uniqueId then 
+        if ticketContent.uniqueId == uniqueId then
             activeTickets[id] = nil
         end
     end
-    
+
     for _, id in ipairs(GetPlayers()) do
-        local xPlayer = ESX.GetPlayerFromId(id)
-        if xPlayer ~= nil then 
-            if tableHasValue(Config.Groups, xPlayer.getGroup()) then 
-                xPlayer.triggerEvent('rlo_ticketpanel:client:syncDelete', uniqueId)
-            end
+        if Bridge.IsAdmin(id) then
+            TriggerClientEvent('rlo_ticketpanel:client:syncDelete', id, uniqueId)
         end
     end
 end)
 
 RegisterNetEvent('rlo_ticketpanel:server:syncState', function(ticketContent)
-    local xAdmin = ESX.GetPlayerFromId(source)
+    local source = source
+    if not Bridge.IsAdmin(source) then return end
 
+    local packedTicket
     for id, requestContent in pairs(activeTickets) do
-        if requestContent.uniqueId == ticketContent.uniqueId then 
-            activeTickets[id].claimedBy = xAdmin.getName()
+        if requestContent.uniqueId == ticketContent.uniqueId then
+            activeTickets[id].claimedBy = Bridge.GetName(source)
             packedTicket = activeTickets[id]
         end
     end
-    
+    if not packedTicket then return end
+
     for _, id in ipairs(GetPlayers()) do
-        local xPlayer = ESX.GetPlayerFromId(id)
-        if xPlayer ~= nil then 
-            if tableHasValue(Config.Groups, xPlayer.getGroup()) then 
-                xPlayer.triggerEvent('rlo_ticketpanel:client:syncState', packedTicket)
-            end
+        if Bridge.IsAdmin(id) then
+            TriggerClientEvent('rlo_ticketpanel:client:syncState', id, packedTicket)
         end
     end
 end)
 
-RegisterNetEvent('esx:playerLoaded', function(player, xPlayer, isNew)
-    if xPlayer ~= nil then 
-        if tableHasValue(Config.Group, xPlayer.getGroup()) then 
-            xPlayer.triggerEvent('rlo_ticketpanel:client:syncOnJoin', activeRequests)
-        end
+Bridge.OnPlayerLoaded(function(playerId)
+    if Bridge.IsAdmin(playerId) then
+        TriggerClientEvent('rlo_ticketpanel:client:syncOnJoin', playerId, activeTickets)
     end
 end)

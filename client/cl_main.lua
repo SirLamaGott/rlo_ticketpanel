@@ -9,7 +9,7 @@ function closeUi()
 end
 
 RegisterCommand(Config.PanelCommand or 'adminPanel', function(source, args, rawCommand)
-    ESX.TriggerServerCallback('rlo_ticketpanel:callback:isAdmin', function(isAdmin)
+    Bridge.TriggerServerCallback('rlo_ticketpanel:callback:isAdmin', function(isAdmin)
         if isAdmin then 
             if not isInPanel then 
                 isInPanel = true
@@ -40,7 +40,7 @@ RegisterCommand(Config.PanelCommand or 'adminPanel', function(source, args, rawC
 end)
 
 RegisterCommand(Config.NoNotifyCommand or 'noNotify', function(source, args, rawCommand)
-    ESX.TriggerServerCallback('rlo_ticketpanel:callback:isAdmin', function(isAdmin)
+    Bridge.TriggerServerCallback('rlo_ticketpanel:callback:isAdmin', function(isAdmin)
         if not isAdmin then
             ShowNotification(Translation['no_perms'])
             return
@@ -52,16 +52,15 @@ RegisterCommand(Config.NoNotifyCommand or 'noNotify', function(source, args, raw
     end, source)
 end)
 
-RegisterNetEvent('rlo_ticketpanel:client:syncRequest', function(activeTickets, newUniqueId)
-    local ticketContent = activeTickets[newUniqueId]
+RegisterNetEvent('rlo_ticketpanel:client:syncRequest', function(ticketContent)
     if not ticketContent then return end
 
-    print('Trying to sync, TicketContent', ESX.DumpTable(ticketContent))
+    if Config.Debug then print('Trying to sync, TicketContent', json.encode(ticketContent)) end
 
     SendNUIMessage({type = 'createTicket', ticketContent = ticketContent})
 
-    if not noNotify then 
-        print('Notifying!')
+    if not noNotify then
+        if Config.Debug then print('Notifying!') end
         TriggerEvent('chat:addMessage', {
             template = '<div class="chat-message support"><i class="fas fa-bell"></i> <b><span style="color: #28b3de"> Support-Anfrage {0}</span>&nbsp;<span style="font-size: 14px; color: #e1e1e1;"></span></b><div style="margin-top: 5px; font-weight: 300;">{1}</div></div>',
             args = { '[' .. ticketContent.playerName .. ' - ' .. ticketContent.playerId .. ']', ticketContent.reason }
@@ -83,9 +82,10 @@ RegisterNUICallback('waypoint', function(data)
     ShowNotification(Translation['set_waypoint'])
 end)
 
-RegisterNUICallback('teleport', function(targetId) 
-    ESX.TriggerServerCallback('rlo_ticketpanel:callback:getTargetCoords', function(targetCoords)
-        ESX.Game.Teleport(PlayerPedId(), targetCoords, function()
+RegisterNUICallback('teleport', function(targetId)
+    Bridge.TriggerServerCallback('rlo_ticketpanel:callback:getTargetCoords', function(targetCoords)
+        if not targetCoords then return end
+        Bridge.Teleport(targetCoords, function()
             ShowNotification(Translation['teleported'])
         end)
     end, targetId)
@@ -94,17 +94,16 @@ end)
 RegisterNUICallback('syncDelete', function(uniqueId)  TriggerServerEvent('rlo_ticketpanel:server:syncDelete', uniqueId) end)
 RegisterNetEvent('rlo_ticketpanel:client:syncDelete', function(uniqueId) SendNUIMessage({type = 'removeTicket', uniqueId = uniqueId}) end)
 
-RegisterNUICallback('syncState', function(ticketContent)  
-    print('(Client) syncing this is the ticket content:', ESX.DumpTable(ticketContent))
-    TriggerServerEvent('rlo_ticketpanel:server:syncState', ticketContent) 
+RegisterNUICallback('syncState', function(ticketContent)
+    if Config.Debug then print('(Client) syncing this is the ticket content:', json.encode(ticketContent)) end
+    TriggerServerEvent('rlo_ticketpanel:server:syncState', ticketContent)
 end)
 RegisterNetEvent('rlo_ticketpanel:client:syncState', function(ticketContent) SendNUIMessage({type = 'syncState', ticketContent = ticketContent}) end)
 
 
 RegisterNetEvent('rlo_ticketpanel:client:syncOnJoin', function(activeTickets)
-    print('Active Tickets: '..ESX.DumpTable(activeTickets))
+    if Config.Debug then print('Active Tickets: '..json.encode(activeTickets)) end
     for uniqueId, ticketContent in pairs(activeTickets) do
-        print('uniqueId: '..uniqueId.. ' | ticketContent: '..ESX.DumpTable(ticketContent))
         SendNUIMessage({type = 'createRequest', ticketContent = ticketContent})
     end
 end)
